@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>ROKSIT</title>
+<meta charset="UTF-8">
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+		sendAjax();
+	});
+
+	function sendAjax() {
+		var jsonData = $.parseJSON('{"name":"cagatay","id":2}');
+		var jsonStringData = JSON.stringify(jsonData); 
+		debugger;
+		$.ajax({
+			url : "http://localhost:8081/RestfulWebService/Testcontroller",
+			type : 'POST',
+			dataType : 'json',
+			data : jsonStringData,
+			contentType : 'application/json',
+			mimeType : 'application/json',
+			success : function(data) {
+				alert(data.id + " " + data.name);
+			},
+			error : function(data, status, er) {
+				alert("error: " + data + " status: " + status + " er:" + er);
+			}
+		});
+	}
+</script>
+
+
+</head>
+<body>
+
+
+
+	<div class="container">
+
+		<div class="header">
+			
+		</div>
+
+		<div class="content">
+
+			
+		</div>
+
+	</div>
+
+</body>
+</html>

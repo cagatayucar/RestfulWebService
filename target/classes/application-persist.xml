@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.5.xsd
+           http://www.springframework.org/schema/security 
+           http://www.springframework.org/schema/security/spring-security-2.0.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/security 
+           http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		
+		<property name="annotatedClasses">
+		    <list>
+		        <value>spring.service.pojo.Personel</value>
+		        <value>spring.service.pojo.PersonelType</value>
+		    </list>
+		    
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${database.dialect}</prop>
+				<prop key="hibernate.show_sql">${database.show_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${database.hbm2ddl}</prop>			
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.jdbc.batch_size">500</prop>
+			</props>
+		</property>
+	</bean>	
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${database.connection.driver}" />
+		<property name="jdbcUrl" value="${database.connection.url}" />
+		<property name="user" value="${database.connection.username}" />
+		<property name="password" value="${database.connection.password}" />
+		<property name="initialPoolSize" value="${database.connection.initialPoolSize}" />
+		<property name="minPoolSize" value="${database.connection.minPoolSize}" />
+		<property name="maxPoolSize" value="${database.connection.maxPoolSize}" />
+		<!-- <property name="timeout"><value>0</value></property> --><!-- 0 means: no timeout -->
+		<property name="idleConnectionTestPeriod" value="${database.connection.idleConnectionTestPeriod}" />
+		<property name="preferredTestQuery" value="${database.connection.preferredTestQuery}" />
+		<property name="acquireIncrement" value="${database.connection.acquireIncrement}" />
+		<!-- 0 means: statement caching is turned off.  -->
+		<property name="maxStatements" value="${database.connection.maxStatements}" />
+		<!-- APPARENT DEADLOCK -->
+		<property name="numHelperThreads" value="${database.connection.numHelperThreads}" />
+		<property name="maxStatementsPerConnection" value="${database.connection.maxStatementsPerConnection}" />
+		
+		<property name="maxAdministrativeTaskTime" value="${database.connection.maxAdministrativeTaskTime}" />
+		<property name="unreturnedConnectionTimeout" value="${database.connection.unreturnedConnectionTimeout}" />
+		<property name="debugUnreturnedConnectionStackTraces" value="${database.connection.debugUnreturnedConnectionStackTraces}" />
+	</bean>
+
+	<bean id="hibernateTemplateForPersonel" class="org.springframework.orm.hibernate4.HibernateTemplate" name="template">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!-- Hibernate Transaction Manager Definition -->
+	<bean id="transactionManagerForPersonel"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager" >
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!--  Will be used in Services  -->
+	<bean id="transactionProxy" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManagerForPersonel" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+				<!--
+					<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+					<prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
+					<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+					<prop key="save*">PROPAGATION_REQUIRED</prop>
+					<prop key="update*">PROPAGATION_REQUIRED</prop>
+					<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				--> 
+			</props>
+		</property>
+	</bean>
+	
+	<bean  
+	  class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+	  <property name="prefix">  
+	   <value>/WEB-INF/pages/</value>  
+	  </property>  
+	  <property name="suffix">  
+	   <value>.jsp</value>  
+	  </property>  
+	 </bean>  
+
+
+</beans>
+
